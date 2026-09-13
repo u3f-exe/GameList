@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لیست بازی‌ها</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--border:#2e3248;--accent:#6c63ff;--accent-soft:rgba(108,99,255,0.12);--accent-border:rgba(108,99,255,0.35);--text:#e8e9f0;--text2:#8b8fa8;--text3:#555870;--success:#22c55e;--success-soft:rgba(34,197,94,0.1);--danger:#ef4444;--danger-soft:rgba(239,68,68,0.1);--radius:8px;--radius-lg:12px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100;}
+.topbar-brand{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;}
+.topbar-brand svg{color:var(--accent);}
+.cart-btn{position:relative;width:40px;height:40px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);}
+.cart-count{position:absolute;top:-6px;left:-6px;width:19px;height:19px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:600;display:none;align-items:center;justify-content:center;}
+.cart-count.show{display:flex;}
+.search-bar{padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface);}
+.search-inner{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;}
+.search-inner input{border:none;background:transparent;color:var(--text);font-size:14px;outline:none;width:100%;font-family:inherit;}
+.search-inner svg{color:var(--text3);flex-shrink:0;}
+.filter-row{padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.filter-label{font-size:12px;color:var(--text2);white-space:nowrap;}
+.filter-select{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface2);color:var(--text);font-size:13px;font-family:inherit;}
+.filter-value-sel{padding:6px 10px;border:1px solid var(--accent-border);border-radius:var(--radius);background:var(--accent-soft);color:var(--accent);font-size:13px;font-family:inherit;}
+.reset-btn{padding:6px 12px;border-radius:var(--radius);border:1px solid var(--danger);background:transparent;color:var(--danger);font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.genre-tabs{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;gap:6px;overflow-x:auto;background:var(--bg);}
+.genre-tabs::-webkit-scrollbar{height:0;}
+.gtab{padding:5px 14px;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap;border:1px solid var(--border);background:var(--surface);color:var(--text2);transition:all 0.15s;}
+.gtab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.gtab:hover:not(.active){border-color:var(--text3);color:var(--text);}
+.game-list{padding:12px 16px;display:flex;flex-direction:column;gap:8px;padding-bottom:90px;}
+.game-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:border-color 0.15s;}
+.game-card:hover{border-color:var(--accent-border);}
+.game-card.expanded{border-color:var(--accent);}
+.card-main{padding:12px 14px;display:flex;align-items:center;gap:10px;}
+.card-info{flex:1;min-width:0;}
+.game-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.meta-row{display:flex;flex-wrap:wrap;gap:4px;}
+.chip{font-size:11px;color:var(--text2);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:2px 8px;white-space:nowrap;}
+.add-btn{width:36px;height:36px;border-radius:var(--radius);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:20px;font-weight:300;transition:all 0.15s;}
+.add-btn.add{background:rgba(34,197,94,0.15);color:var(--success);}
+.add-btn.add:hover{background:var(--success);color:#fff;}
+.add-btn.remove{background:var(--danger-soft);color:var(--danger);}
+.add-btn.remove:hover{background:var(--danger);color:#fff;}
+.card-detail{padding:0 14px 12px;border-top:1px solid var(--border);display:none;}
+.card-detail.open{display:block;padding-top:12px;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;margin-bottom:8px;}
+.detail-row{font-size:12px;display:flex;flex-direction:column;gap:2px;}
+.detail-row .dlabel{color:var(--text3);}
+.detail-row .dval{color:var(--text2);}
+.detail-full{font-size:12px;margin-top:6px;color:var(--text2);line-height:1.5;}
+.detail-full .dlabel{color:var(--text3);margin-bottom:2px;}
+.no-info{font-size:12px;color:var(--text3);font-style:italic;}
+.section-head{font-size:11px;font-weight:600;color:var(--text3);padding:8px 0 6px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:0.5px;}
+.section-head::after{content:'';flex:1;height:1px;background:var(--border);}
+.empty{text-align:center;padding:50px 16px;color:var(--text3);}
+.float-bar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:10px 16px;display:none;align-items:center;gap:10px;z-index:90;}
+.float-bar.show{display:flex;}
+.float-label{font-size:13px;color:var(--text);flex:1;}
+.float-count{background:var(--accent);color:#fff;border-radius:20px;padding:3px 12px;font-size:12px;font-weight:600;}
+.copy-btn{padding:8px 16px;border-radius:var(--radius);background:var(--success-soft);color:var(--success);border:1px solid var(--success);font-size:13px;cursor:pointer;font-family:inherit;}
+.copy-btn:hover{background:var(--success);color:#fff;}
+
+/* CART PAGE */
+.cart-page{display:none;position:fixed;inset:0;background:var(--bg);z-index:200;overflow-y:auto;}
+.cart-page.show{display:block;}
+.cart-topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;gap:12px;height:52px;position:sticky;top:0;}
+.back-btn{padding:7px 14px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;}
+.cart-title{font-size:15px;font-weight:600;}
+.cart-body{padding:16px;}
+.cart-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.cart-item-name{font-size:14px;font-weight:500;}
+.cart-item-meta{font-size:12px;color:var(--text2);margin-top:3px;}
+.remove-cart{width:28px;height:28px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;font-size:16px;}
+.cart-actions{padding:16px;border-top:1px solid var(--border);display:flex;gap:8px;}
+.cart-actions button{flex:1;padding:10px;border-radius:var(--radius);font-size:14px;cursor:pointer;font-family:inherit;}
+.copied-msg{text-align:center;font-size:12px;color:var(--success);margin-top:8px;display:none;}
+select option{background:var(--surface2);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01M8 12h.01M16 12h.01"/></svg>
+    لیست بازی‌ها
+  </div>
+  <div class="cart-btn" onclick="openCart()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg>
+    <span class="cart-count" id="cart-count">0</span>
+  </div>
+</div>
+
+<div class="search-bar">
+  <div class="search-inner">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search" placeholder="جستجوی بازی..." oninput="applyFilters()">
+  </div>
+</div>
+
+<div class="filter-row">
+  <span class="filter-label">فیلتر:</span>
+  <select class="filter-select" id="filter-type" onchange="updateFilterValues()">
+    <option value="">— بدون فیلتر —</option>
+    <option value="genre">ژانر</option>
+    <option value="year">سال انتشار</option>
+    <option value="developer">سازنده</option>
+  </select>
+  <select class="filter-value-sel" id="filter-value" onchange="applyFilters()" style="display:none;"></select>
+  <button class="reset-btn" onclick="resetAll()">↺ پاک کردن</button>
+</div>
+
+<div class="genre-tabs" id="genre-tabs"></div>
+<div class="game-list" id="game-list"></div>
+
+<div class="float-bar" id="float-bar">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg>
+  <span class="float-label">لیست انتخابی</span>
+  <span class="float-count" id="float-count">0</span>
+  <button class="copy-btn" onclick="openCart()">مشاهده و کپی</button>
+</div>
+
+<!-- CART PAGE -->
+<div class="cart-page" id="cart-page">
+  <div class="cart-topbar">
+    <button class="back-btn" onclick="closeCart()">← برگشت</button>
+    <span class="cart-title">لیست انتخابی من</span>
+  </div>
+  <div class="cart-body" id="cart-body"></div>
+  <div class="cart-actions">
+    <button onclick="copyCart()" style="background:var(--success-soft);color:var(--success);border:1px solid var(--success);">کپی لیست</button>
+    <button onclick="clearCart()" style="background:var(--danger-soft);color:var(--danger);border:1px solid var(--danger);">پاک کردن</button>
+  </div>
+  <div class="copied-msg" id="copied-msg">✓ لیست کپی شد!</div>
+</div>
+
+<script>
+const GAMES = [{"id":"1","name":"ASSASSIN'S CREED I","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2007","version":"","size":"","installTime":"5 دقیقه","requirements":"","notes":""},{"id":"2","name":"ASSASSIN'S CREED II Deluxe Edition","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2009","version":"","size":"3GB","installTime":"","requirements":"","notes":""},{"id":"3","name":"ASSASSIN'S CREED II","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2009","version":"","size":"","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"4","name":"ASSASSIN'S CREED II","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2009","version":"","size":"2.16GB","installTime":"","requirements":"","notes":""},{"id":"5","name":"ASSASSIN'S CREED II","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2009","version":"","size":"3.96GB","installTime":"","requirements":"","notes":""},{"id":"6","name":"ASSASSIN'S CREED Brotherhood Complete Edition","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2010","version":"","size":"3.79GB","installTime":"","requirements":"","notes":""},{"id":"7","name":"ASSASSIN'S CREED REVELATIONS","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2011","version":"","size":"8.1GB","installTime":"","requirements":"","notes":""},{"id":"8","name":"ASSASSIN'S CREED III","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2012","version":"","size":"6.41GB","installTime":"","requirements":"","notes":""},{"id":"9","name":"ASSASSIN'S CREED IV Black Flag Jackdaw Edition","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2013","version":"","size":"6.9GB","installTime":"","requirements":"","notes":""},{"id":"10","name":"ASSASSIN'S CREED Rogue Deluxe Edition","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2014","version":"","size":"3.92GB","installTime":"4 دقیقه","requirements":"","notes":""},{"id":"11","name":"ASSASSIN'S CREED Unity Gold Edition","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2014","version":"","size":"33.5GB","installTime":"8 دقیقه","requirements":"","notes":""},{"id":"12","name":"ASSASSIN'S CREED Syndicate Gold Edition","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2015","version":"","size":"25.8GB","installTime":"12 دقیقه","requirements":"","notes":""},{"id":"13","name":"ASSASSIN'S CREED Origins Gold Edition","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2017","version":"","size":"41GB","installTime":"11-20 دقیقه","requirements":"","notes":""},{"id":"14","name":"ASSASSIN'S CREED Odyssey Gold Edition","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2018","version":"","size":"55.2GB","installTime":"22 دقیقه","requirements":"","notes":""},{"id":"15","name":"ASSASSIN'S CREED VALHALLA","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2020","version":"","size":"38.6GB","installTime":"12-15 دقیقه","requirements":"","notes":""},{"id":"16","name":"ASSASSIN'S CREED Mirage","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2024","version":"","size":"28.9GB","installTime":"9 دقیقه","requirements":"","notes":""},{"id":"17","name":"Far Cry 1 (GOG) PROPER","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2004","version":"","size":"2.4GB","installTime":"","requirements":"","notes":""},{"id":"18","name":"Far Cry 1","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2004","version":"","size":"2.12GB","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"19","name":"Far Cry 2 Fortunes Edition","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2008","version":"","size":"2.7GB","installTime":"","requirements":"","notes":""},{"id":"20","name":"Far Cry 3 Complete Collection","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2012","version":"","size":"","installTime":"6 دقیقه","requirements":"","notes":""},{"id":"21","name":"Far Cry 4 Gold Edition","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2014","version":"","size":"","installTime":"10 دقیقه","requirements":"","notes":""},{"id":"22","name":"Far Cry 4 Gold","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2014","version":"","size":"","installTime":"18 دقیقه","requirements":"","notes":""},{"id":"23","name":"Far Cry 5","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2018","version":"","size":"","installTime":"25-60 دقیقه","requirements":"","notes":""},{"id":"24","name":"Far Cry 5 New Dawn DDN 1 05","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2019","version":"","size":"","installTime":"6 دقیقه","requirements":"","notes":""},{"id":"25","name":"Far Cry 6 Ultimate Edition","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2021","version":"","size":"","installTime":"16-25 دقیقه","requirements":"","notes":""},{"id":"26","name":"Far Cry Primal - Apex Edition","genre":"اکشن-ادونچر","developer":"Ubisoft","year":"2016","version":"","size":"9.41GB","installTime":"","requirements":"","notes":""},{"id":"27","name":"God of War","genre":"اکشن-ادونچر","developer":"Santa Monica Studio","year":"2020","version":"","size":"","installTime":"8-15 دقیقه","requirements":"","notes":""},{"id":"28","name":"God of War Ragnarok","genre":"اکشن-ادونچر","developer":"Santa Monica Studio","year":"2024","version":"","size":"76GB","installTime":"","requirements":"","notes":""},{"id":"29","name":"Just Cause 2 Complete Edition","genre":"اکشن-ادونچر","developer":"Avalanche Studios","year":"2010","version":"","size":"","installTime":"2 دقیقه","requirements":"","notes":""},{"id":"30","name":"Just Cause 3","genre":"اکشن-ادونچر","developer":"Avalanche Studios","year":"2015","version":"","size":"22.1GB","installTime":"","requirements":"","notes":""},{"id":"31","name":"Just Cause 4 Gold Edition","genre":"اکشن-ادونچر","developer":"Avalanche Studios","year":"2018","version":"","size":"27.2GB","installTime":"","requirements":"","notes":""},{"id":"32","name":"SIFU","genre":"اکشن-ادونچر","developer":"Sloclap","year":"2022","version":"","size":"8.82GB","installTime":"","requirements":"","notes":""},{"id":"33","name":"Spider-Man 1","genre":"اکشن-ادونچر","developer":"Treyarch","year":"2002","version":"","size":"487MB","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"34","name":"Marvel's Spider-Man 2","genre":"اکشن-ادونچر","developer":"Insomniac Games","year":"2002","version":"","size":"1GB","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"35","name":"Marvel's Spider-Man 2","genre":"اکشن-ادونچر","developer":"Insomniac Games","year":"2004","version":"","size":"537MB","installTime":"","requirements":"","notes":""},{"id":"36","name":"Spider-Man: Ultimate Spider-Man","genre":"اکشن-ادونچر","developer":"Treyarch","year":"2005","version":"","size":"813MB","installTime":"","requirements":"","notes":""},{"id":"37","name":"Spider-Man: Friend or Foe","genre":"اکشن-ادونچر","developer":"Next Level Games","year":"2007","version":"","size":"2.14GB","installTime":"","requirements":"","notes":""},{"id":"38","name":"Spider-Man 3","genre":"اکشن-ادونچر","developer":"Treyarch","year":"2007","version":"","size":"4.1GB","installTime":"","requirements":"","notes":""},{"id":"39","name":"Spider-Man: Web of Shadows","genre":"اکشن-ادونچر","developer":"Shaba Games","year":"2008","version":"","size":"6.62GB","installTime":"","requirements":"","notes":""},{"id":"40","name":"Spider-Man: Shattered Dimensions","genre":"اکشن-ادونچر","developer":"Beenox","year":"2010","version":"","size":"4.1GB","installTime":"","requirements":"","notes":""},{"id":"41","name":"The Amazing Spider-Man 1","genre":"اکشن-ادونچر","developer":"Beenox","year":"2012","version":"","size":"7.24GB","installTime":"2 دقیقه","requirements":"","notes":""},{"id":"42","name":"The Amazing Spider-Man 2","genre":"اکشن-ادونچر","developer":"Beenox","year":"2014","version":"","size":"7.7GB","installTime":"2 دقیقه","requirements":"","notes":""},{"id":"43","name":"The Amazing Spider-Man Collection (1 & 2)","genre":"اکشن-ادونچر","developer":"Beenox","year":"2014","version":"","size":"14.1GB","installTime":"","requirements":"","notes":""},{"id":"44","name":"Marvel's Spider-Man Remastered","genre":"اکشن-ادونچر","developer":"Insomniac Games","year":"2022","version":"","size":"38.8GB","installTime":"12 دقیقه","requirements":"","notes":""},{"id":"45","name":"Marvel's Spider-Man: Miles Morales","genre":"اکشن-ادونچر","developer":"Insomniac Games","year":"2022","version":"","size":"27.9GB","installTime":"7-30 دقیقه","requirements":"","notes":""},{"id":"46","name":"Marvel's Spider-Man 2","genre":"اکشن-ادونچر","developer":"Insomniac Games","year":"2024","version":"","size":"","installTime":"20 دقیقه","requirements":"","notes":""},{"id":"47","name":"Tomb Raider Rise of the Tomb Raider","genre":"اکشن-ادونچر","developer":"Crystal Dynamics","year":"2016","version":"","size":"12.91GB","installTime":"","requirements":"","notes":""},{"id":"48","name":"Shadow of the Tomb Raider Definitive Edition","genre":"اکشن-ادونچر","developer":"Crystal Dynamics","year":"2018","version":"","size":"28.6GB","installTime":"","requirements":"","notes":""},{"id":"49","name":"Tomb Raider (2013) Definitive Edition","genre":"اکشن-ادونچر","developer":"Crystal Dynamics","year":"2024","version":"","size":"9.21GB","installTime":"","requirements":"","notes":""},{"id":"50","name":"METRO 2033","genre":"ترسناک","developer":"4A Games","year":"2010","version":"","size":"6.43GB","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"51","name":"METRO 2033","genre":"ترسناک","developer":"4A Games","year":"2010","version":"","size":"4.29GB","installTime":"","requirements":"","notes":""},{"id":"52","name":"METRO 2033","genre":"ترسناک","developer":"4A Games","year":"2010","version":"","size":"6.25GB","installTime":"","requirements":"","notes":""},{"id":"53","name":"METRO: Last Light BlackBox Repack","genre":"ترسناک","developer":"4A Games","year":"2013","version":"","size":"","installTime":"6 دقیقه","requirements":"","notes":""},{"id":"54","name":"METRO 2 Last Light Complete Edition","genre":"ترسناک","developer":"4A Games","year":"2013","version":"","size":"","installTime":"","requirements":"","notes":""},{"id":"55","name":"METRO: Last Light","genre":"ترسناک","developer":"4A Games","year":"2013","version":"","size":"7.30GB","installTime":"","requirements":"","notes":""},{"id":"56","name":"METRO Redux (1+2)","genre":"ترسناک","developer":"4A Games","year":"2014","version":"","size":"6.18GB","installTime":"25 دقیقه","requirements":"","notes":""},{"id":"57","name":"METRO: Exodus","genre":"ترسناک","developer":"4A Games","year":"2019","version":"","size":"50.74GB","installTime":"","requirements":"","notes":""},{"id":"58","name":"Resident Evil Revelations 2 Complete Season","genre":"ترسناک","developer":"Capcom","year":"2015","version":"","size":"9.42GB","installTime":"","requirements":"","notes":""},{"id":"59","name":"Resident Evil Revelations 2: Episode 4","genre":"ترسناک","developer":"Capcom","year":"2015","version":"","size":"12.5GB","installTime":"","requirements":"","notes":""},{"id":"60","name":"Resident Evil 3","genre":"ترسناک","developer":"Capcom","year":"2020","version":"","size":"","installTime":"4 دقیقه","requirements":"","notes":""},{"id":"61","name":"Resident Evil 3 (Classic)","genre":"ترسناک","developer":"Capcom","year":"1999","version":"","size":"","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"62","name":"Resident Evil 4 HD Edition","genre":"ترسناک","developer":"Capcom","year":"2014","version":"","size":"3.28GB","installTime":"","requirements":"","notes":""},{"id":"63","name":"Resident Evil 4 (Classic)","genre":"ترسناک","developer":"Capcom","year":"2005","version":"","size":"2.3GB","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"64","name":"Resident Evil 4 HD Remaster","genre":"ترسناک","developer":"Capcom","year":"2014","version":"","size":"17.5GB","installTime":"","requirements":"","notes":""},{"id":"65","name":"Resident Evil 4 Remake Deluxe Edition","genre":"ترسناک","developer":"Capcom","year":"2023","version":"","size":"41.8GB","installTime":"19-54 دقیقه","requirements":"","notes":""},{"id":"66","name":"Resident Evil 5","genre":"ترسناک","developer":"Capcom","year":"2009","version":"","size":"7.4GB","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"67","name":"Resident Evil Revelations","genre":"ترسناک","developer":"Capcom","year":"2013","version":"","size":"7.96GB","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"68","name":"Resident Evil 7 Biohazard","genre":"ترسناک","developer":"Capcom","year":"2017","version":"","size":"24.8GB","installTime":"15 دقیقه","requirements":"","notes":""},{"id":"69","name":"Resident Evil Village","genre":"ترسناک","developer":"Capcom","year":"2021","version":"","size":"19.7GB","installTime":"13-20 دقیقه","requirements":"","notes":""},{"id":"70","name":"Ghost of Tsushima Director's Cut","genre":"نقش‌آفرینی","developer":"Sucker Punch Productions","year":"2024","version":"","size":"45GB","installTime":"","requirements":"","notes":""},{"id":"71","name":"Hogwarts Legacy Deluxe Edition","genre":"نقش‌آفرینی","developer":"","year":"2023","version":"","size":"58.8GB","installTime":"95 دقیقه","requirements":"","notes":""},{"id":"72","name":"Hogwarts Legacy Deluxe Edition (Update 3)","genre":"نقش‌آفرینی","developer":"Avalanche Software","year":"2023","version":"","size":"33GB","installTime":"","requirements":"","notes":""},{"id":"73","name":"Max Payne 1","genre":"نقش‌آفرینی","developer":"Remedy Entertainment","year":"2001","version":"","size":"666MB","installTime":"","requirements":"","notes":"نسخه فارسی موجود | نسخه فارسی"},{"id":"74","name":"Max Payne 1","genre":"نقش‌آفرینی","developer":"Remedy Entertainment","year":"2001","version":"","size":"1.38GB","installTime":"","requirements":"","notes":""},{"id":"75","name":"Max Payne 2: The Fall of Max Payne","genre":"نقش‌آفرینی","developer":"Remedy Entertainment","year":"2003","version":"","size":"1.96GB","installTime":"","requirements":"","notes":""},{"id":"76","name":"Max Payne 3","genre":"نقش‌آفرینی","developer":"Remedy Entertainment","year":"2012","version":"","size":"14.2GB","installTime":"20 دقیقه","requirements":"","notes":""},{"id":"77","name":"The Witcher 2: Assassins of Kings","genre":"نقش‌آفرینی","developer":"CD Projekt RED","year":"2011","version":"","size":"6.34GB","installTime":"","requirements":"","notes":""},{"id":"78","name":"The Witcher 3: Wild Hunt Complete Edition","genre":"نقش‌آفرینی","developer":"CD Projekt RED","year":"2015","version":"","size":"44.4GB","installTime":"26-60 دقیقه","requirements":"","notes":""},{"id":"79","name":"Battlefield Bad Company 2","genre":"شوتر","developer":"DICE","year":"2008","version":"","size":"7.13GB","installTime":"","requirements":"","notes":""},{"id":"80","name":"Battlefield 3","genre":"شوتر","developer":"DICE","year":"2011","version":"","size":"10.8GB","installTime":"18 دقیقه","requirements":"","notes":""},{"id":"81","name":"Battlefield 4","genre":"شوتر","developer":"DICE","year":"2013","version":"","size":"17.8GB","installTime":"7 دقیقه","requirements":"","notes":""},{"id":"82","name":"Battlefield 1 Digital Deluxe Edition","genre":"شوتر","developer":"DICE","year":"2016","version":"","size":"18.76GB","installTime":"17 دقیقه","requirements":"","notes":""},{"id":"83","name":"Battlefield V","genre":"شوتر","developer":"DICE","year":"2018","version":"","size":"50.5GB","installTime":"8 دقیقه","requirements":"","notes":""},{"id":"84","name":"Call of Duty 1 + United Offensive","genre":"شوتر","developer":"Activision","year":"2003","version":"","size":"2.01GB","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"85","name":"Call of Duty 1 + United Offensive","genre":"شوتر","developer":"Activision","year":"2003","version":"","size":"2.03GB","installTime":"","requirements":"","notes":""},{"id":"86","name":"Call of Duty 2 ","genre":"شوتر","developer":"Activision","year":"2005","version":"","size":"3.34GB","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"87","name":"Call of Duty 2 ","genre":"شوتر","developer":"Activision","year":"2005","version":"","size":"3.53GB","installTime":"","requirements":"","notes":""},{"id":"88","name":"Call of Duty 4 MW1 Complete","genre":"شوتر","developer":"Activision","year":"2007","version":"","size":"","installTime":"2 دقیقه","requirements":"","notes":""},{"id":"89","name":"Call of Duty 4 MW1 Elamigos","genre":"شوتر","developer":"Activision","year":"2007","version":"","size":"","installTime":"3 دقیقه","requirements":"","notes":""},{"id":"90","name":"Call of Duty 4 MW1","genre":"شوتر","developer":"Activision","year":"2007","version":"","size":"4.36GB","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"91","name":"Call of Duty 5 World at War","genre":"شوتر","developer":"Activision","year":"2008","version":"","size":"6.45GB","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"92","name":"Call of Duty 5 World at War","genre":"شوتر","developer":"Activision","year":"2008","version":"","size":"","installTime":"6 دقیقه","requirements":"","notes":""},{"id":"93","name":"Call of Duty MW2","genre":"شوتر","developer":"Activision","year":"2009","version":"","size":"11.20GB","installTime":"","requirements":"","notes":""},{"id":"94","name":"Call of Duty 7 Black Ops","genre":"شوتر","developer":"Activision","year":"2010","version":"","size":"","installTime":"7 دقیقه","requirements":"","notes":""},{"id":"95","name":"Call of Duty: Black Ops Collection Edition","genre":"شوتر","developer":"Activision","year":"2010","version":"","size":"8.15GB","installTime":"20 دقیقه","requirements":"","notes":""},{"id":"96","name":"Call of Duty 8 MW3","genre":"شوتر","developer":"Activision","year":"2011","version":"","size":"1.70GB","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"97","name":"Call of Duty 8 MW3","genre":"شوتر","developer":"Activision","year":"2011","version":"","size":"","installTime":"10-15 دقیقه","requirements":"","notes":""},{"id":"98","name":"Call of Duty 9 BLACK OPS II","genre":"شوتر","developer":"Activision","year":"2012","version":"","size":"","installTime":"5 دقیقه","requirements":"","notes":""},{"id":"99","name":"Call of Duty 9 BLACK OPS II","genre":"شوتر","developer":"Activision","year":"2012","version":"","size":"","installTime":"6 دقیقه","requirements":"","notes":""},{"id":"100","name":"Call of Duty 10 Ghost","genre":"شوتر","developer":"Activision","year":"2013","version":"","size":"","installTime":"20-30 دقیقه","requirements":"","notes":""},{"id":"101","name":"Call of Duty 11 Advanced Warfare-complete edition","genre":"شوتر","developer":"Activision","year":"2014","version":"","size":"","installTime":"13 دقیقه","requirements":"","notes":""},{"id":"102","name":"Call of Duty 12 BLACK OPS III","genre":"شوتر","developer":"Activision","year":"2015","version":"","size":"","installTime":"15 دقیقه","requirements":"","notes":""},{"id":"103","name":"Call of Duty 13 Infinite Warfare","genre":"شوتر","developer":"Activision","year":"2016","version":"","size":"","installTime":"10-15 دقیقه","requirements":"","notes":""},{"id":"104","name":"Call of Duty: WWII","genre":"شوتر","developer":"Activision","year":"2017","version":"","size":"32.1GB","installTime":"","requirements":"","notes":""},{"id":"105","name":"Crysis 1","genre":"شوتر","developer":"Crytek","year":"2007","version":"","size":"6.71GB","installTime":"","requirements":"","notes":""},{"id":"106","name":"Crysis 1 Remastered","genre":"شوتر","developer":"Crytek","year":"2020","version":"","size":"10.43GB","installTime":"20 دقیقه","requirements":"","notes":""},{"id":"107","name":"Crysis 1 Warhead","genre":"شوتر","developer":"Crytek","year":"2008","version":"","size":"","installTime":"3 دقیقه","requirements":"","notes":"نسخه فارسی موجود"},{"id":"108","name":"Crysis 1 Warhead","genre":"شوتر","developer":"Crytek","year":"2008","version":"","size":"3.3GB","installTime":"","requirements":"","notes":""},{"id":"109","name":"Crysis 2","genre":"شوتر","developer":"Crytek","year":"2011","version":"","size":"4.47GB","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"110","name":"Crysis 2 Remastered","genre":"شوتر","developer":"Crytek","year":"2021","version":"","size":"28.2GB","installTime":"9-13 دقیقه","requirements":"","notes":""},{"id":"111","name":"Crysis 2","genre":"شوتر","developer":"Crytek","year":"2011","version":"","size":"","installTime":"5 دقیقه","requirements":"","notes":""},{"id":"112","name":"Crysis 3 Remastered","genre":"شوتر","developer":"Crytek","year":"2021","version":"","size":"10.3GB","installTime":"5 دقیقه","requirements":"","notes":""},{"id":"113","name":"Crysis Collection","genre":"شوتر","developer":"Crytek","year":"2011","version":"","size":"8.16GB","installTime":"","requirements":"","notes":""},{"id":"114","name":"Crysis","genre":"شوتر","developer":"Crytek","year":"2007","version":"","size":"6.85GB","installTime":"","requirements":"","notes":""},{"id":"115","name":"Medal of Honor: Allied Assault War Chest","genre":"شوتر","developer":"2015 Inc","year":"2002","version":"","size":"2.37GB","installTime":"","requirements":"","notes":""},{"id":"116","name":"Medal of Honor: Allied Assault Breakthrough","genre":"شوتر","developer":"DICE","year":"2003","version":"","size":"1.89GB","installTime":"","requirements":"","notes":""},{"id":"117","name":"Medal of Honor: Pacific Assault","genre":"شوتر","developer":"EA LA","year":"2004","version":"","size":"2.52GB","installTime":"2 دقیقه","requirements":"","notes":""},{"id":"118","name":"Medal of Honor: Airborne","genre":"شوتر","developer":"EA LA","year":"2007","version":"","size":"3.28GB","installTime":"","requirements":"","notes":""},{"id":"119","name":"Medal of Honor (2010) Limited Edition","genre":"شوتر","developer":"Danger Close Games","year":"2010","version":"","size":"3.17GB","installTime":"4 دقیقه","requirements":"","notes":""},{"id":"120","name":"Medal of Honor (2010)","genre":"شوتر","developer":"Danger Close Games","year":"2010","version":"","size":"5.89GB","installTime":"4 دقیقه","requirements":"","notes":""},{"id":"121","name":"Medal of Honor: Warfighter","genre":"شوتر","developer":"Danger Close Games","year":"2012","version":"","size":"15.1GB","installTime":"","requirements":"","notes":""},{"id":"122","name":"Quake Enhanced Edition","genre":"شوتر","developer":"id Software","year":"2021","version":"","size":"708MB","installTime":"","requirements":"","notes":""},{"id":"123","name":"Return to Castle Wolfenstein","genre":"شوتر","developer":"Gray Matter Studios","year":"2001","version":"","size":"668MB","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"124","name":"Wolfenstein (2009)","genre":"شوتر","developer":"Raven Software","year":"2009","version":"","size":"2.97GB","installTime":"","requirements":"","notes":""},{"id":"125","name":"Wolfenstein The Old Blood","genre":"شوتر","developer":"MachineGames","year":"2015","version":"","size":"35.3GB","installTime":"","requirements":"","notes":""},{"id":"126","name":"Wolfenstein II The New Colossus","genre":"شوتر","developer":"MachineGames","year":"2017","version":"","size":"42.3GB","installTime":"","requirements":"","notes":""},{"id":"127","name":"Wolfenstein Youngblood","genre":"شوتر","developer":"MachineGames","year":"2019","version":"","size":"39GB","installTime":"","requirements":"","notes":""},{"id":"128","name":"Sniper: Ghost Warrior 1","genre":"اسنایپر","developer":"CI Games","year":"2010","version":"","size":"4.27GB","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"129","name":"Sniper: Ghost Warrior 2","genre":"اسنایپر","developer":"CI Games","year":"2013","version":"","size":"8.81GB","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"130","name":"Sniper: Ghost Warrior 3","genre":"اسنایپر","developer":"CI Games","year":"2017","version":"","size":"31.6GB","installTime":"1 ساعت","requirements":"","notes":""},{"id":"131","name":"Sniper Ghost Warrior Contracts","genre":"اسنایپر","developer":"CI Games","year":"2019","version":"","size":"8.26GB","installTime":"","requirements":"","notes":""},{"id":"132","name":"Sniper Ghost Warrior Contracts 2","genre":"اسنایپر","developer":"CI Games","year":"2021","version":"","size":"9.53GB","installTime":"","requirements":"","notes":""},{"id":"133","name":"Sniper Ghost Warrior Contracts 2","genre":"اسنایپر","developer":"CI Games","year":"2021","version":"","size":"","installTime":"4-8 دقیقه","requirements":"","notes":""},{"id":"134","name":"Sniper Art of Victory","genre":"اسنایپر","developer":"City Interactive","year":"2008","version":"","size":"645MB","installTime":"","requirements":"","notes":""},{"id":"135","name":"Sniper Elite 2 Complete","genre":"اسنایپر","developer":"Rebellion","year":"2012","version":"","size":"6.94GB","installTime":"","requirements":"","notes":""},{"id":"136","name":"Sniper Elite 2","genre":"اسنایپر","developer":"Rebellion","year":"2012","version":"","size":"7.13GB","installTime":"","requirements":"","notes":"نسخه فارسی موجود | نسخه فارسی"},{"id":"137","name":"Sniper Elite 2 Remastered","genre":"اسنایپر","developer":"Rebellion","year":"2019","version":"","size":"","installTime":"2 دقیقه","requirements":"","notes":""},{"id":"138","name":"Sniper Elite 3 (FULL)","genre":"اسنایپر","developer":"Rebellion","year":"2014","version":"","size":"14.14GB","installTime":"","requirements":"","notes":""},{"id":"139","name":"Sniper Elite 3","genre":"اسنایپر","developer":"Rebellion","year":"2014","version":"","size":"","installTime":"","requirements":"","notes":"نسخه گردو"},{"id":"140","name":"Sniper Elite 4","genre":"اسنایپر","developer":"Rebellion","year":"2017","version":"","size":"","installTime":"14 دقیقه","requirements":"","notes":""},{"id":"141","name":"Sniper Elite 5","genre":"اسنایپر","developer":"Rebellion","year":"2022","version":"","size":"65GB","installTime":"","requirements":"","notes":""},{"id":"142","name":"DARK","genre":"مخفی‌کاری","developer":"Realmforge Studios","year":"2013","version":"","size":"4.15GB","installTime":"","requirements":"","notes":""},{"id":"143","name":"Hitman 3","genre":"مخفی‌کاری","developer":"IO Interactive","year":"2021","version":"","size":"53.67GB","installTime":"","requirements":"","notes":""},{"id":"144","name":"Mafia I Definitive Edition","genre":"مخفی‌کاری","developer":"Hangar 13","year":"2020","version":"","size":"11.5GB","installTime":"","requirements":"","notes":""},{"id":"145","name":"Mafia I (Classic)","genre":"مخفی‌کاری","developer":"Hangar 13","year":"2002","version":"","size":"1.51GB","installTime":"","requirements":"","notes":"نسخه فارسی موجود"},{"id":"146","name":"Mafia II Definitive Edition","genre":"مخفی‌کاری","developer":"Hangar 13","year":"2020","version":"","size":"10.9GB","installTime":"15 دقیقه","requirements":"","notes":""},{"id":"147","name":"Mafia III Definitive Edition","genre":"مخفی‌کاری","developer":"Hangar 13","year":"2020","version":"","size":"19.31GB","installTime":"60 دقیقه","requirements":"","notes":""}];
+let cart = JSON.parse(localStorage.getItem('gm_cart')||'[]');
+let activeGenre = '';
+let expandedId = '';
+
+function saveCart(){localStorage.setItem('gm_cart',JSON.stringify(cart));}
+
+// genres
+const genres = [...new Set(GAMES.map(g=>g.genre).filter(Boolean))];
+
+function initGenreTabs(){
+  const el=document.getElementById('genre-tabs');
+  el.innerHTML=genres.map((g,i)=>`<div class="gtab${i===0?' active':''}" onclick="pickGenre('${g}')">${g}</div>`).join('');
+  if(genres.length>0) activeGenre=genres[0];
+}
+
+function pickGenre(g){
+  activeGenre=g;
+  document.querySelectorAll('.gtab').forEach(t=>t.classList.toggle('active',t.textContent===g));
+  applyFilters();
+}
+
+function updateFilterValues(){
+  const type=document.getElementById('filter-type').value;
+  const sel=document.getElementById('filter-value');
+  if(!type){sel.style.display='none';applyFilters();return;}
+  const vals=[...new Set(GAMES.map(g=>g[type]).filter(Boolean))].sort();
+  sel.innerHTML=`<option value="">— همه —</option>`+vals.map(v=>`<option>${v}</option>`).join('');
+  sel.style.display='';
+  applyFilters();
+}
+
+function applyFilters(){
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  const type=document.getElementById('filter-type').value;
+  const val=(document.getElementById('filter-value').value||'');
+
+  let games=GAMES;
+  if(activeGenre && !type) games=games.filter(g=>g.genre===activeGenre);
+  if(type&&val) games=games.filter(g=>(g[type]||'')===(val));
+  if(q) games=games.filter(g=>g.name.toLowerCase().includes(q)||(g.developer||'').toLowerCase().includes(q));
+
+  renderList(games);
+}
+
+function renderList(games){
+  const el=document.getElementById('game-list');
+  if(games.length===0){el.innerHTML='<div class="empty">بازی‌ای یافت نشد</div>';return;}
+
+  // group by genre if no filter
+  const type=document.getElementById('filter-type').value;
+  const q=document.getElementById('search').value;
+  const grouped = (!type && !q) ? groupBy(games,'genre') : {'نتایج جستجو': games};
+
+  el.innerHTML=Object.entries(grouped).map(([genre,list])=>`
+    <div class="section-head">${genre} — ${list.length} بازی</div>
+    ${list.map(g=>gameCard(g)).join('')}
+  `).join('');
+}
+
+function groupBy(arr,key){
+  return arr.reduce((acc,g)=>{
+    const k=g[key]||'سایر';
+    if(!acc[k])acc[k]=[];
+    acc[k].push(g);
+    return acc;
+  },{});
+}
+
+function gameCard(g){
+  const inCart=cart.includes(g.id);
+  const expanded=expandedId===g.id;
+  return `<div class="game-card${expanded?' expanded':''}" id="card-${g.id}">
+    <div class="card-main" onclick="toggleExpand('${g.id}')">
+      <div class="card-info">
+        <div class="game-name">${g.name}</div>
+        <div class="meta-row">
+          ${g.year?`<span class="chip">${g.year}</span>`:''}
+          ${g.version?`<span class="chip">${g.version}</span>`:''}
+          ${g.developer?`<span class="chip">${g.developer}</span>`:''}
+          ${g.size?`<span class="chip">${g.size}</span>`:''}
+          ${g.installTime?`<span class="chip">${g.installTime}</span>`:''}
+        </div>
+      </div>
+      <button class="add-btn ${inCart?'remove':'add'}" onclick="event.stopPropagation();toggleCart('${g.id}')">
+        ${inCart?'−':'+'}
+      </button>
+    </div>
+    <div class="card-detail${expanded?' open':''}">
+      ${buildDetail(g)}
+    </div>
+  </div>`;
+}
+
+function buildDetail(g){
+  const rows=[];
+  if(g.developer) rows.push({l:'سازنده',v:g.developer});
+  if(g.year) rows.push({l:'سال انتشار',v:g.year});
+  if(g.version) rows.push({l:'نسخه',v:g.version});
+  if(g.size) rows.push({l:'حجم',v:g.size});
+  if(g.installTime) rows.push({l:'زمان نصب',v:g.installTime});
+  if(rows.length===0&&!g.requirements&&!g.notes) return `<p class="no-info">اطلاعات تکمیلی ثبت نشده</p>`;
+  return `
+    ${rows.length>0?`<div class="detail-grid">${rows.map(r=>`<div class="detail-row"><span class="dlabel">${r.l}</span><span class="dval">${r.v}</span></div>`).join('')}</div>`:''}
+    ${g.requirements?`<div class="detail-full"><div class="dlabel">حداقل سیستم:</div>${g.requirements}</div>`:''}
+    ${g.notes?`<div class="detail-full" style="margin-top:6px"><div class="dlabel">توضیحات:</div>${g.notes}</div>`:''}
+  `;
+}
+
+function toggleExpand(id){
+  expandedId = expandedId===id?'':id;
+  applyFilters();
+}
+
+function toggleCart(id){
+  if(cart.includes(id)) cart=cart.filter(x=>x!==id);
+  else cart.push(id);
+  saveCart();
+  updateCartUI();
+  applyFilters();
+}
+
+function updateCartUI(){
+  const n=cart.length;
+  const cc=document.getElementById('cart-count');
+  cc.textContent=n;
+  cc.classList.toggle('show',n>0);
+  document.getElementById('float-count').textContent=n;
+  document.getElementById('float-bar').classList.toggle('show',n>0);
+  document.getElementById('float-count').textContent=n+' بازی';
+}
+
+function openCart(){
+  renderCartPage();
+  document.getElementById('cart-page').classList.add('show');
+}
+
+function closeCart(){
+  document.getElementById('cart-page').classList.remove('show');
+}
+
+function renderCartPage(){
+  const items=GAMES.filter(g=>cart.includes(g.id));
+  const el=document.getElementById('cart-body');
+  if(items.length===0){el.innerHTML='<div class="empty">هیچ بازی انتخاب نشده</div>';return;}
+  el.innerHTML=items.map(g=>`
+    <div class="cart-item">
+      <div>
+        <div class="cart-item-name">${g.name}</div>
+        <div class="cart-item-meta">${[g.genre,g.year,g.size].filter(Boolean).join(' · ')}</div>
+      </div>
+      <button class="remove-cart" onclick="toggleCart('${g.id}');renderCartPage()">✕</button>
+    </div>
+  `).join('');
+}
+
+function copyCart(){
+  const items=GAMES.filter(g=>cart.includes(g.id));
+  const text=items.map((g,i)=>`${i+1}. ${g.name}${g.year?' ('+g.year+')':''}${g.developer?' — '+g.developer:''}${g.size?' | '+g.size:''}`).join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    const msg=document.getElementById('copied-msg');
+    msg.style.display='block';
+    setTimeout(()=>msg.style.display='none',2500);
+  });
+}
+
+function clearCart(){
+  cart=[];
+  saveCart();
+  updateCartUI();
+  renderCartPage();
+  applyFilters();
+}
+
+function resetAll(){
+  cart=[];saveCart();
+  document.getElementById('search').value='';
+  document.getElementById('filter-type').value='';
+  document.getElementById('filter-value').style.display='none';
+  expandedId='';
+  if(genres.length>0){activeGenre=genres[0];document.querySelectorAll('.gtab').forEach((t,i)=>t.classList.toggle('active',i===0));}
+  updateCartUI();
+  applyFilters();
+}
+
+initGenreTabs();
+applyFilters();
+updateCartUI();
+</script>
+</body>
+</html>

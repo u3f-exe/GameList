@@ -343,7 +343,7 @@ function resetAll(){
 }
 document.getElementById('filter-type').value='genre';
 updateFilterValues();updateCartUI();
-function parseSzGB(s){if(!s)return 0;const m=String(s).match(/([d.]+)[s]*(GB|MB|TB)/i);if(!m)return 0;const n=parseFloat(m[1]),u=m[2].toUpperCase();return u==='TB'?n*1024:u==='MB'?n/1024:n;}
+function parseSzGB(s){if(!s)return 0;const m=String(s).match(/([\d.]+)[\s]*(GB|MB|TB)/i);if(!m)return 0;const n=parseFloat(m[1]),u=m[2].toUpperCase();return u==='TB'?n*1024:u==='MB'?n/1024:n;}
 function fmtGB(gb){return gb>=1024?(gb/1024).toFixed(1)+' TB':Math.round(gb)+' GB';}
 function renderGStats(){
   const el=document.getElementById('g-stats');if(!el)return;

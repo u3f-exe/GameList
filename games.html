@@ -23,9 +23,12 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--t
 .cart-btn{position:relative;width:40px;height:40px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);}
 .cart-count{position:absolute;top:-6px;left:-6px;width:19px;height:19px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:600;display:none;align-items:center;justify-content:center;}
 .cart-count.show{display:flex;}
-.filter-bar{padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.search-inner{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;flex:1;min-width:160px;}
+.filter-bar{padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:8px;flex-wrap:wrap;position:sticky;top:52px;z-index:90;}
+.search-inner{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px 8px 12px;flex:1;min-width:160px;}
 .search-inner input{border:none;background:transparent;color:var(--text);font-size:14px;outline:none;width:100%;font-family:inherit;direction:ltr;text-align:left;}
+.search-clear{width:22px;height:22px;flex:0 0 22px;border:0;border-radius:50%;background:transparent;color:var(--text3);display:none;align-items:center;justify-content:center;cursor:pointer;font-size:16px;line-height:1;padding:0;}
+.search-clear.show{display:flex;}
+.search-clear:hover{background:var(--surface2);color:var(--text);}
 .filter-sel{padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface2);color:var(--text);font-size:13px;font-family:inherit;}
 .filter-val{padding:7px 10px;border:1px solid var(--accent-border);border-radius:var(--radius);background:var(--accent-soft);color:var(--accent);font-size:13px;font-family:inherit;}
 .reset-btn{padding:7px 12px;border-radius:var(--radius);border:1px solid var(--danger);background:transparent;color:var(--danger);font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;}
@@ -37,7 +40,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--t
 .game-card.expanded{border-color:var(--accent);}
 .card-main{padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;}
 .card-info{flex:1;min-width:0;}
-.game-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:5px;direction:ltr;text-align:left;}
+.game-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:5px;direction:ltr;text-align:right;user-select:text;-webkit-user-select:text;cursor:text;}
 .meta-row{display:flex;flex-wrap:wrap;gap:4px;align-items:center;}
 .chip{font-size:11px;color:var(--text2);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:2px 8px;white-space:nowrap;}
 .chip.farsi{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:var(--success);}
@@ -99,7 +102,8 @@ select option{background:var(--surface2);}
 <div class="filter-bar">
   <div class="search-inner">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" id="search" placeholder="جستجو در همه بازی‌ها..." oninput="applyFilters()">
+    <input type="text" id="search" placeholder="جستجو در همه بازی‌ها..." oninput="applyFilters();updateSearchClear()">
+    <button type="button" class="search-clear" id="search-clear" onclick="clearSearch(event)" title="پاک کردن جستجو" aria-label="پاک کردن جستجو">×</button>
   </div>
   <select class="filter-sel" id="filter-type" onchange="updateFilterValues()">
     <option value="genre">ژانر</option>
@@ -252,7 +256,7 @@ function gameCard(g){
   return`<div class="game-card${expanded?' expanded':''}" id="card-${g.id}">
     <div class="card-main" onclick="toggleExpand('${g.id}')">
       <div class="card-info">
-        <div class="game-name">${g.isNew?'<span style="color:var(--success)">🆕</span> ':''}${g.name} ${loc}</div>
+        <div class="game-name" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation();copyGameName('${g.id}')" title="کلیک برای کپی نام بازی">${g.isNew?'<span style="color:var(--success)">🆕</span> ':''}${g.name} ${loc}</div>
         <div class="meta-row">
           ${(Array.isArray(g.genre)?g.genre:(g.genre?[g.genre]:[])).map(gn=>`<span class="chip" style="background:var(--accent-soft);border-color:var(--accent-border);color:var(--accent)">${gn}</span>`).join('')}
           ${g.year?`<span class="chip">${g.year}</span>`:''}
@@ -301,6 +305,32 @@ function buildDetail(g){
   }
   if(!html) return'<p style="font-size:12px;color:var(--text3)">اطلاعات تکمیلی ثبت نشده</p>';
   return html;
+}
+function updateSearchClear(){
+  const input=document.getElementById('search');
+  const btn=document.getElementById('search-clear');
+  if(!input||!btn)return;
+  btn.classList.toggle('show',!!input.value);
+}
+function clearSearch(e){
+  if(e)e.stopPropagation();
+  const input=document.getElementById('search');
+  if(!input)return;
+  input.value='';
+  updateSearchClear();
+  applyFilters();
+  input.focus();
+}
+async function copyGameName(id){
+  const g=GAMES.find(x=>x.id===id);
+  if(!g)return;
+  const name=String(g.name||'');
+  try{await navigator.clipboard.writeText(name);showNotify('✓ نام بازی کپی شد');}
+  catch(err){
+    const ta=document.createElement('textarea');ta.value=name;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.focus();ta.select();
+    try{document.execCommand('copy');showNotify('✓ نام بازی کپی شد');}finally{ta.remove();}
+  }
 }
 function toggleExpand(id){expandedId=expandedId===id?'':id;applyFilters();}
 function toggleCart(id){
@@ -355,13 +385,14 @@ function clearCart(){cart=[];saveCart();updateCartUI();renderCartPage();applyFil
 function resetAll(){
   cart=[];saveCart();
   document.getElementById('search').value='';
+  updateSearchClear();
   document.getElementById('filter-type').value='genre';
   document.getElementById('filter-isnew').checked=false;
   expandedId='';
   updateCartUI();updateFilterValues();
 }
 document.getElementById('filter-type').value='genre';
-updateFilterValues();updateCartUI();
+updateFilterValues();updateCartUI();updateSearchClear();
 function parseSzGB(s){if(!s)return 0;const m=String(s).match(/([\d.]+)[\s]*(GB|MB|TB)/i);if(!m)return 0;const n=parseFloat(m[1]),u=m[2].toUpperCase();return u==='TB'?n*1024:u==='MB'?n/1024:n;}
 function fmtGB(gb){return gb>=1024?(gb/1024).toFixed(1)+' TB':Math.round(gb)+' GB';}
 function renderGStats(){

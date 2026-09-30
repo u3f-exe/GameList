@@ -52,20 +52,21 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--t
 .add-btn.remove:hover{background:var(--danger);color:#fff;}
 .google-btn{width:32px;height:32px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;}
 .google-btn:hover{background:var(--surface2);border-color:var(--text3);color:var(--text);}
-.card-detail{padding:12px 14px;border-top:1px solid var(--border);display:none;}
+.card-detail{padding:12px 14px;border-top:1px solid var(--border);display:none;min-width:0;overflow:hidden;}
 .card-detail.open{display:block;}
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;margin-bottom:8px;}
-.detail-row{font-size:12px;display:flex;flex-direction:column;gap:2px;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;margin-bottom:8px;min-width:0;}
+.detail-row{font-size:12px;display:flex;flex-direction:column;gap:2px;min-width:0;}
 .dlabel{color:var(--text3);font-size:11px;}
-.dval{color:var(--text2);direction:ltr;text-align:right;}
-.detail-full{font-size:12px;margin-top:8px;color:var(--text2);line-height:1.6;direction:ltr;text-align:right;}
+.dval{color:var(--text2);direction:ltr;text-align:right;overflow-wrap:anywhere;word-break:break-word;white-space:normal;min-width:0;}
+.detail-full{font-size:12px;margin-top:8px;color:var(--text2);line-height:1.6;direction:ltr;text-align:right;overflow-wrap:anywhere;word-break:break-word;white-space:normal;min-width:0;}
 .detail-full .dlabel{direction:rtl;text-align:right;margin-bottom:3px;display:block;}
-.version-crack-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:6px;}
-.info-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px;min-width:0;}
-.info-box-title{font-size:11px;color:var(--text3);margin-bottom:6px;display:block;}
-.version-list{display:flex;flex-direction:column;gap:5px;}
-.version-row{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px;font-size:12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;direction:ltr;justify-content:flex-end;text-align:right;}
-.ver-chip{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:2px 8px;font-size:11px;color:var(--text2);}
+.version-crack-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 16px;margin-top:8px;min-width:0;}
+.version-crack-grid .detail-row{min-width:0;}
+.version-list{display:flex;flex-wrap:wrap;gap:4px;min-width:0;}
+.version-row{background:transparent;border:0;padding:0;font-size:12px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;direction:ltr;justify-content:flex-end;text-align:right;min-width:0;}
+.ver-chip{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:2px 7px;font-size:11px;color:var(--text2);max-width:100%;overflow-wrap:anywhere;}
+.crack-value{font-size:12px;color:var(--text2);direction:ltr;text-align:right;line-height:1.6;overflow-wrap:anywhere;word-break:break-word;white-space:normal;min-width:0;}
+@media(max-width:700px){.version-crack-grid{grid-template-columns:1fr;}}
 .empty{text-align:center;padding:50px 16px;color:var(--text3);}
 .float-bar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:10px 16px;display:none;align-items:center;gap:10px;z-index:90;}
 .float-bar.show{display:flex;}
@@ -284,10 +285,10 @@ function buildDetail(g){
   if(g.requirementsRec)html+=`<div class="detail-full"><span class="dlabel">سیستم پیشنهادی:</span>${g.requirementsRec}</div>`;
   if(g.notes)html+=`<div class="detail-full"><span class="dlabel">توضیحات:</span>${g.notes}</div>`;
   if((g.versions&&g.versions.length)||g.crackType){
-    html+=`<div class="detail-full"><div class="version-crack-grid">
-      ${g.versions&&g.versions.length?`<div class="info-box"><span class="info-box-title">نسخه‌های موجود</span><div class="version-list">${g.versions.map(v=>`<div class="version-row">${v.name||v.repack?`<span class="ver-chip">${v.name||v.repack}</span>`:''}${v.size?`<span class="ver-chip">💾 ${v.size}</span>`:''}${v.installTime?`<span class="ver-chip">⏱ ${v.installTime}</span>`:''}${v.location?`<span class="ver-chip">${locIcon(v.location)}</span>`:''}${v.notes?`<span style="font-size:11px;color:var(--text3)">${v.notes}</span>`:''}</div>`).join('')}</div></div>`:''}
-      ${g.crackType?`<div class="info-box"><span class="info-box-title">نوع کرک</span><div style="font-size:12px;color:var(--text2);direction:ltr;text-align:right;line-height:1.6">${g.crackType}</div></div>`:''}
-    </div></div>`;
+    html+=`<div class="version-crack-grid">
+      ${g.versions&&g.versions.length?`<div class="detail-row"><span class="dlabel">نسخه‌های موجود</span><div class="version-list">${g.versions.map(v=>`<div class="version-row">${v.name||v.repack?`<span class="ver-chip">${v.name||v.repack}</span>`:''}${v.size?`<span class="ver-chip">💾 ${v.size}</span>`:''}${v.installTime?`<span class="ver-chip">⏱ ${v.installTime}</span>`:''}${v.location?`<span class="ver-chip">${locIcon(v.location)}</span>`:''}${v.notes?`<span style="font-size:11px;color:var(--text3);overflow-wrap:anywhere">${v.notes}</span>`:''}</div>`).join('')}</div></div>`:''}
+      ${g.crackType?`<div class="detail-row"><span class="dlabel">نوع کرک</span><div class="crack-value">${g.crackType}</div></div>`:''}
+    </div>`;
   }
   if(!html)return'<p style="font-size:12px;color:var(--text3)">اطلاعات تکمیلی ثبت نشده</p>';return html;
 }
